@@ -37,7 +37,7 @@ import { cardService } from '../services/card.lyw.service';
                   <p class="text-muted font-size-sm">
                     Miembro desde {{ moment(user.dateCreated).format('YYYY-MM-DD') }}
                   </p>
-                  <button class="btn btn-primary">Cerrar Sesión</button>
+                  <button @click="logout()" class="btn btn-primary">Cerrar Sesión</button>
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@ export default {
     };
   },
   methods: {
-    async logout() {
+    logout() {
       localStorage.removeItem('id');
       this.$router.push('/home');
     },
