@@ -52,7 +52,7 @@ import { cardService } from '../services/card.lyw.service';
                 <span class="text-secondary">{{ user.name }}</span>
               </li>
               <li
-                v-for="card in user.cards"
+                v-for="card in cards.data"
                 class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
               >
                 <i class="fa-brands fa-cc-visa" style="color: #1a1f71"></i>
@@ -160,18 +160,18 @@ export default {
     }
     await userService.getById(id).then((response) => {
       this.user = response;
-      console.log(this.user);
     });
     await bicycleService.getByUserId(id).then((response) => {
       this.user.bicycles = response;
     });
     await cardService.getByUserId(id).then((response) => {
-      this.user.cards = response;
+      this.cards = response;
     });
   },
   data() {
     return {
       user: {},
+      cards: [],
     };
   },
   methods: {

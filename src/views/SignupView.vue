@@ -112,7 +112,7 @@ export default {
         email: this.email,
         password: this.password1,
         phone: '999888777',
-        image: 'https://i.pinimg.com/474x/ab/01/43/ab01437a16fdf57072342eb1a9bc303a.jpg',
+        image: 'https://robohash.org/' + this.name,
         birthDate: '2000-01-01',
       };
       const dataID = {
@@ -120,8 +120,10 @@ export default {
         password: this.password1,
       };
       try {
-        await userService.create(user);
-        localStorage.setItem('id', await userService.login(dataID));
+        await userService.signup(user);
+        const response = await userService.loginrev1(dataID);
+        localStorage.setItem('id', response.id);
+        localStorage.setItem('jwt', response.token);
         return true;
       } catch (error) {
         return false;
