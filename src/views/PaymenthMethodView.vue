@@ -111,7 +111,6 @@ export default {
   name: 'PaymentMethodView',
   async mounted() {
     const id = localStorage.getItem('id');
-    await cardService.getByUserId(id).then((response) => {});
   },
   data() {
     return {
@@ -131,16 +130,12 @@ export default {
   methods: {
     async onSubmit() {
       if (!(await this.validForm())) return;
-      if (!(await this.createCard())) {
-        this.errorToast('Hubo un error al crear la cuenta');
-        return;
-      }
       try {
         await this.createCard();
         this.successToast();
         await new Promise((resolve) => setTimeout(resolve, 3000));
+        this.$router.push('/profile');
       } catch (error) {
-        console.error('Error creating payment method:', error);
         this.errorToast('Hubo un error al crear el método de pago');
       }
     },
@@ -150,8 +145,8 @@ export default {
         return false;
       }
 
-      if (!isValidCardNumber(this.PaymentData.cardNumber)) {
-        this.errorToast('Número de tarjeta inválido');
+      if (!this.PaymentData.cardNumber.length === 16) {
+        this.errorToast('Número de tarjeta no tiene 16 dígitos');
         return false;
       }
 
@@ -192,11 +187,9 @@ export default {
           type: this.PaymentData.cardType,
           userId: this.userId,
         };
-        console.log(cardData);
         const response = await cardService.create(cardData);
         return response.data;
       } catch (error) {
-        console.error('Error creating card:', error);
         throw error;
       }
     },
@@ -218,33 +211,6 @@ export default {
     },
   },
 };
-
-function isValidCardNumber(cardNumber) {
-  const cleanedCardNumber = cardNumber.replace(/[\s-]/g, '');
-
-  if (!/^\d+$/.test(cleanedCardNumber)) {
-    return false;
-  }
-
-  let sum = 0;
-  let shouldDouble = false;
-
-  for (let i = cleanedCardNumber.length - 1; i >= 0; i--) {
-    let digit = parseInt(cleanedCardNumber.charAt(i), 10);
-
-    if (shouldDouble) {
-      digit *= 2;
-      if (digit > 9) {
-        digit -= 9;
-      }
-    }
-
-    sum += digit;
-    shouldDouble = !shouldDouble;
-  }
-
-  return sum % 10 === 0;
-}
 
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
