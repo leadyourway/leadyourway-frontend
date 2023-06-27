@@ -168,12 +168,20 @@
               <div v-for="card in cards" class="card card-atm border rounded mt-3">
                 <div class="card-body">
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="card" :id="card.id" @click="selectCard(card.id)" />
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="card"
+                      :id="card.id"
+                      @click="selectCard(card.id)"
+                    />
                     <label class="form-check-label" :for="card.id">
                       <div class="d-flex align-items-xxl-center">
-                        <div :class="`fab fa-cc-${card.type == 'visa' ? 'visa' : 'mastercard'}`"></div>
+                        <div
+                          :class="`fab fa-cc-${card.type == 'visa' ? 'visa' : 'mastercard'}`"
+                        ></div>
                         <div class="card-details">
-                          <span class="card-name">{{card.name}}</span>
+                          <span class="card-name">{{ card.name }}</span>
                           <br />
                           <span class="card-info">{{ card.number }}</span>
                           <br />
@@ -212,7 +220,11 @@
                     <p class="fw-bold">Total</p>
                     <p class="fw-bold"><span class="fas fa-dollar-sign"></span>{{ total }}</p>
                   </div>
-                  <button :disabled="!this.selectedCard" @click.prevent="rentBicycle()" class="btn btn-primary mt-2">
+                  <button
+                    :disabled="!this.selectedCard"
+                    @click.prevent="rentBicycle()"
+                    class="btn btn-primary mt-2"
+                  >
                     Pagar S/.{{ total }}
                   </button>
                 </div>
@@ -240,7 +252,7 @@ export default {
       insuranceTotal: 0.0,
       total: 0.0,
       selectedCard: null,
-      cards: []
+      cards: [],
     };
   },
 
@@ -319,27 +331,28 @@ export default {
     getCards() {
       const id = localStorage.getItem('id');
       cardService.getByUserId(id).then((response) => {
-      this.cards = response;
-      this.cards.forEach((card) => {
-        card.expirationDate = card.expirationDate.slice(5, 7) + '/' + card.expirationDate.slice(2, 4);
+        this.cards = response.data;
+        this.cards.forEach((card) => {
+          card.expirationDate =
+            card.expirationDate.slice(5, 7) + '/' + card.expirationDate.slice(2, 4);
+        });
+        console.log(this.cards);
       });
-      console.log(this.cards);
-    });
     },
 
     getBicycle() {
       const bicycleId = localStorage.getItem('bicycleId');
-    if (bicycleId.length > 0) {
-      bicycleService.getById(bicycleId).then((response) => {
-        this.bicycle = response;
-        this.calculatePrice();
-      });
-    }
+      if (bicycleId.length > 0) {
+        bicycleService.getById(bicycleId).then((response) => {
+          this.bicycle = response;
+          this.calculatePrice();
+        });
+      }
     },
 
     selectCard(cardId) {
       this.selectedCard = cardId;
-    }
+    },
   },
 
   mounted() {
