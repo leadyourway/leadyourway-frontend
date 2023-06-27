@@ -1,13 +1,13 @@
 <template>
   <div class="about-component">
-    <div class="first-part">
+    <div class="first-part" :class="{ 'full-width': isMobile }">
       <div>
         <h1 class="font-semibold text-900"><span class="text-orange-500">Lead</span> Your way</h1>
         <p>{{ $t('about-content') }}</p>
         <div class="buttons"></div>
       </div>
     </div>
-    <div class="second-part">
+    <div class="second-part" :class="{ 'full-width': isMobile }">
       <div class="carousel">
         <img :src="currentImage" alt="Imagen del carrusel" />
         <button class="next-button" @click="nextImage">
@@ -30,6 +30,7 @@ export default {
         'https://images.prismic.io/santacruzbikesstatic/0b6725b2-f71a-4182-af54-36929b8edbc6_62i36DdE.jpeg?auto=compress,format',
       ],
       currentImageIndex: 0,
+      isMobile: false,
     };
   },
   computed: {
@@ -41,11 +42,19 @@ export default {
     nextImage() {
       this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
     },
+    checkWindowWidth() {
+      this.isMobile = window.innerWidth < 768;
+    },
   },
   mounted() {
+    this.checkWindowWidth();
+    window.addEventListener('resize', this.checkWindowWidth);
     setInterval(() => {
       this.nextImage();
     }, 10000); //Milisegundos -> 10 segundos
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkWindowWidth);
   },
 };
 </script>
@@ -61,6 +70,10 @@ export default {
   display: flex;
   align-items: center;
   padding: 20px;
+}
+
+.full-width {
+  width: 100%;
 }
 
 .first-part div {
@@ -81,7 +94,6 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 20px;
-  /*background-color: red;*/
 }
 
 .carousel {
@@ -107,4 +119,11 @@ export default {
 .i-container {
   font-size: 30px;
 }
+
+@media (max-width: 767px) {
+  .about-component {
+    grid-template-columns: 100%;
+  }
+}
 </style>
+

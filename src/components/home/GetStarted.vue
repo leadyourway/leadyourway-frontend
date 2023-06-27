@@ -3,8 +3,8 @@
     <div class="testimonialtop">
       <h1 class="font-semibold text-900 text-orange-500">{{ $t('get-started-slogan') }}</h1>
     </div>
-    <div class="contenedortestimonial">
-      <div class="testimonialtext">
+    <div class="contenedortestimonial" :class="{ 'mobile-layout': isMobile }">
+      <div class="testimonialtext" :class="{ 'full-width': isMobile }">
         <div class="cuerpo-test">
           <p class="text-900 text-xl">
             {{ $t('get-started-content') }}
@@ -12,7 +12,7 @@
           <div class="text-orange-500 font-bold mb-3">>&nbsp;Powered by Discord</div>
         </div>
       </div>
-      <div class="testimonialimg">
+      <div class="testimonialimg" v-if="!isMobile">
         <img
           src="https://cliply.co/wp-content/uploads/2021/08/372108630_DISCORD_LOGO_BLACK_400.gif"
           alt="Gif del logo de discord"
@@ -30,11 +30,29 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      isMobile: false,
+    };
+  },
+  mounted() {
+    this.checkWindowWidth();
+    window.addEventListener('resize', this.checkWindowWidth);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkWindowWidth);
+  },
+  methods: {
+    checkWindowWidth() {
+      this.isMobile = window.innerWidth < 768;
+    },
+  },
+};
 </script>
 
 <style scoped>
-/*Testimonial*/
+/* Testimonial */
 .testimonial {
   margin-top: 20px;
   display: flex;
@@ -46,7 +64,6 @@ export default {};
 .testimonialtop {
   text-align: center;
   width: 100%;
-  /*background-color: red;*/
 }
 
 .testimonialtop h1 {
@@ -64,7 +81,6 @@ export default {};
   align-items: center;
   position: relative;
   display: flex;
-  /*background-color: blue;*/
   margin-left: 50px;
   margin-right: 50px;
 }
@@ -87,4 +103,19 @@ export default {};
   justify-content: center;
   align-items: center;
 }
+
+.full-width {
+  width: 100%;
+}
+
+.mobile-layout {
+  flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .contenedortestimonial {
+    margin: 0;
+  }
+}
 </style>
+
