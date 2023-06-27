@@ -4,7 +4,7 @@
       <img src="../../assets/img/lywlogo.png" alt="Logo" class="logo" />
       <span class="brand-text">Lead Your Way</span>
     </div>
-    <div class="toolbar-middle">
+    <div class="toolbar-middle" v-if="isDesktop">
       <p class="menu-options">
         <span>Home</span> | <span>About</span> | <span>Contact</span> |
         <span><router-link to="/search">Search</router-link></span>
@@ -18,34 +18,42 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
   name: 'HomeHeader',
   data() {
     return {
       user: localStorage.getItem('id'),
+      isDesktop: true,
     };
+  },
+  mounted() {
+    this.checkWindowSize();
+    window.addEventListener('resize', this.checkWindowSize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkWindowSize);
+  },
+  methods: {
+    checkWindowSize() {
+      this.isDesktop = window.innerWidth >= 480;
+    },
   },
 };
 </script>
 
 <style scoped>
-router-link {
-  text-decoration: none;
-  color: black;
-}
 .toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /*background-color: #f0f0f0;*/
   padding: 10px;
 }
 
 .toolbar-left {
   display: flex;
   align-items: center;
-  margin-left: 50px;
 }
 
 .logo {
@@ -66,7 +74,6 @@ router-link {
 
 .menu-options span {
   margin: 0 5px;
-  /*font-weight: bold;*/
   text-transform: uppercase;
   font-size: 14px;
   cursor: pointer;
@@ -79,7 +86,6 @@ router-link {
 
 .toolbar-right {
   text-align: right;
-  margin-right: 50px;
 }
 
 .login-button,
@@ -103,38 +109,24 @@ router-link {
   color: white;
 }
 
-/*
-.login-button:hover {
-  transform: scale(1.1);
-  transition: transform 0.2s;
-}
-
-.signup-button:hover {
-  transform: scale(1.1);
-  transition: transform 0.2s;
-}*/
-
 /* Estilos para dispositivos móviles */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .toolbar {
     padding: 10px;
-    /*flex-direction: column;*/
+    flex-direction: column;
   }
 
   .toolbar-left {
-    margin-left: 0;
+    margin-bottom: 10px;
   }
 
   .toolbar-right {
-    flex-direction: column;
-    align-items: flex-end;
-    align-items: center;
+    margin-top: 10px;
+    text-align: center;
   }
 
-  .login-button,
-  .signup-button {
-    margin: 0;
-    margin-top: 10px;
+  .toolbar-middle {
+    display: none;
   }
 }
 </style>
