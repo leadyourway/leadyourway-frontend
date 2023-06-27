@@ -163,40 +163,21 @@
               <input class="form-control" type="text" />
             </div>
             <div>
-              <p class="dis fw-bold mb-2">Select your Card</p>
-              <div class="card card-atm border rounded mt-3">
-                <div class="card-body">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="card" id="visa" />
-                    <label class="form-check-label" for="visa">
-                      <div class="d-flex align-items-xxl-center">
-                        <div class="fab fa-cc-visa"></div>
-                        <div class="card-details">
-                          <span class="card-name">Oliver Tuesta</span>
-                          <br />
-                          <span class="card-info">**** **** **** 8652</span>
-                          <br />
-                          <span class="card-expiry">Exp: 12/24</span>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
+              <p class="dis fw-bold mb-2">Seleccione una tarjeta</p>
 
-              <div class="card card-atm border rounded mt-3">
+              <div v-for="card in cards" class="card card-atm border rounded mt-3">
                 <div class="card-body">
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="card" id="mastercard" />
-                    <label class="form-check-label" for="mastercard">
+                    <input class="form-check-input" type="radio" name="card" :id="card.id" @click="selectCard(card.id)" />
+                    <label class="form-check-label" :for="card.id">
                       <div class="d-flex align-items-xxl-center">
-                        <div class="fab fa-cc-mastercard"></div>
+                        <div :class="`fab fa-cc-${card.type == 'visa' ? 'visa' : 'mastercard'}`"></div>
                         <div class="card-details">
-                          <span class="card-name">Bernardo Silva</span>
+                          <span class="card-name">{{card.name}}</span>
                           <br />
-                          <span class="card-info">**** **** **** 3442</span>
+                          <span class="card-info">{{ card.number }}</span>
                           <br />
-                          <span class="card-expiry">Exp: 08/14</span>
+                          <span class="card-expiry">{{ card.expirationDate }}</span>
                         </div>
                       </div>
                     </label>
@@ -231,8 +212,8 @@
                     <p class="fw-bold">Total</p>
                     <p class="fw-bold"><span class="fas fa-dollar-sign"></span>{{ total }}</p>
                   </div>
-                  <button @click.prevent="rentBicycle()" class="btn btn-primary mt-2">
-                    Pay<span class="fas fa-dollar-sign px-1"></span>{{ total }}
+                  <button :disabled="!this.selectedCard" @click.prevent="rentBicycle()" class="btn btn-primary mt-2">
+                    Pagar S/.{{ total }}
                   </button>
                 </div>
               </div>
@@ -247,6 +228,7 @@
 <script>
 import { bicycleService } from '../services/bicycle.lyw.service';
 import { rentService } from '../services/rent.lyw.service';
+import { cardService } from '../services/card.lyw.service';
 export default {
   data() {
     return {
@@ -257,11 +239,13 @@ export default {
       subTotal: 0.0,
       insuranceTotal: 0.0,
       total: 0.0,
+      selectedCard: null,
+      cards: []
     };
   },
 
   methods: {
-    calculatePrice(insuranceId) {
+    calculatePrice(insuranceId = -1) {
       switch (insuranceId) {
         case 0:
           this.liabilityInsurance = !this.liabilityInsurance;
@@ -293,11 +277,20 @@ export default {
       console.log('renting bicycle');
       const startDate = localStorage.getItem('startDate');
       const endDate = localStorage.getItem('endDate');
+      if (!this.selectCard) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Seleccione una tarjeta',
+          life: 3000,
+        });
+        return;
+      }
       const rent = {
         startDate: startDate,
         endDate: endDate,
         totalPrice: this.total,
-        cardId: 1, // TODO: get card id from user
+        cardId: this.selectedCard,
         bicycleId: this.bicycle.id,
       };
       console.log(rent);
@@ -323,22 +316,35 @@ export default {
         }
       );
     },
-  },
+    getCards() {
+      const id = localStorage.getItem('id');
+      cardService.getByUserId(id).then((response) => {
+      this.cards = response;
+      this.cards.forEach((card) => {
+        card.expirationDate = card.expirationDate.slice(5, 7) + '/' + card.expirationDate.slice(2, 4);
+      });
+      console.log(this.cards);
+    });
+    },
 
-  mounted() {
-    const script = document.createElement('script');
-    script.src =
-      'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js';
-    script.integrity = 'sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe';
-    script.crossOrigin = 'anonymous';
-    document.body.appendChild(script);
-    const bicycleId = localStorage.getItem('bicycleId');
+    getBicycle() {
+      const bicycleId = localStorage.getItem('bicycleId');
     if (bicycleId.length > 0) {
       bicycleService.getById(bicycleId).then((response) => {
         this.bicycle = response;
-        this.calculatePrice(-1);
+        this.calculatePrice();
       });
     }
+    },
+
+    selectCard(cardId) {
+      this.selectedCard = cardId;
+    }
+  },
+
+  mounted() {
+    this.getBicycle();
+    this.getCards();
   },
 };
 </script>
