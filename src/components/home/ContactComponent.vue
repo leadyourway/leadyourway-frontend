@@ -1,18 +1,18 @@
 <template>
-  <div class="text-center w-27rem mx-auto">
+  <div class="text-center mx-auto" :class="{'w-27rem': !isMobile, 'w-full': isMobile}">
     <h2>{{$t('contactus-title')}}</h2>
     <p>{{ $t('contactus-sub') }}</p>
     <form class="m-3 flex-row" v-on:submit.prevent="submitForm" :class="{ 'form-complete': !formIncomplete }" >
-      <InputText v-model="name" placeholder="Name" class="w-full" :class="formIncomplete ?'f-incomplete' : 'f-complete'" />
-      <InputText v-model="email" placeholder="Email" class="my-3 w-full" :class="formIncomplete ?'f-incomplete' : 'f-complete'" />
-      <Textarea v-model="message" placeholder="Message" rows="5" class="mb-3 w-full" :class="formIncomplete ?'f-incomplete' : 'f-complete'" />
-      <Button label="Send" type="submit" :class="formIncomplete ? 'bg-gradient-to-r from-red-500 to-red-700': 'bg-gradient-to-r from-green-500 to-blue-500 transition duration-500'" class="w-full" ></Button>
+      <InputText v-model="name" placeholder="Name" :class="['w-full', formIncomplete ? 'f-incomplete' : 'f-complete']" />
+      <InputText v-model="email" placeholder="Email" class="my-3" :class="['w-full', formIncomplete ? 'f-incomplete' : 'f-complete']" />
+      <Textarea v-model="message" placeholder="Message" rows="5" class="mb-3" :class="['w-full', formIncomplete ? 'f-incomplete' : 'f-complete']" />
+      <Button label="Send" type="submit" :class="[formIncomplete ? 'bg-gradient-to-r from-red-500 to-red-700' : 'bg-gradient-to-r from-green-500 to-blue-500 transition duration-500', isMobile ? 'w-full' : '']" ></Button>
     </form>
   </div>
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 
 export default {
   setup() {
@@ -20,6 +20,7 @@ export default {
     const email = ref('');
     const message = ref('');
     const formSubmitted = ref(false);
+    const isMobile = ref(false);
 
     // Computed property that checks if any of the form fields are empty
     const formIncomplete = computed(() => {
@@ -45,6 +46,19 @@ export default {
       formSubmitted.value = true;
     }
 
+    function checkWindowWidth() {
+      isMobile.value = window.innerWidth < 768;
+    }
+
+    onMounted(() => {
+      checkWindowWidth();
+      window.addEventListener('resize', checkWindowWidth);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('resize', checkWindowWidth);
+    });
+
     return {
       name,
       email,
@@ -52,6 +66,7 @@ export default {
       formIncomplete,
       formSubmitted,
       submitForm,
+      isMobile,
     };
   },
 };
