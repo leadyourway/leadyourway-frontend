@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-//const API_URL = 'https://leadyourway.azurewebsites.net/api/rent';
-const API_URL = 'http://localhost:5188/api/rent';
+const API_URL = 'https://leadyourway.azurewebsites.net/api/rent';
+//const API_URL = 'http://localhost:5188/api/rent';
 
 export default class RentService {
   async bikeAvailable(id, start, end) {

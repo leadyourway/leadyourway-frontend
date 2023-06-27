@@ -47,7 +47,7 @@ export default {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         return;
       }
-      //this.$router.push('/create');
+      this.$router.push('/create');
     },
   },
 };
