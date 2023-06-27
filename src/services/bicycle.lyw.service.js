@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://leadyourway.azurewebsites.net/api/bicycle';
-//const API_URL = 'http://localhost:5188/api/bicycle';
+//const API_URL = 'https://leadyourway.azurewebsites.net/api/bicycle';
+const API_URL = 'http://localhost:5188/api/bicycle';
 
 const http = axios.create({
   baseURL: API_URL,
